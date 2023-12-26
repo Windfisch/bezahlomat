@@ -2,6 +2,7 @@
 import ctk_wrap as tk
 import re
 import unicodedata
+import sys
 
 topratio = 0.2
 botratio = 0.15
@@ -11,8 +12,15 @@ fontsmall = ("Sans", 20)
 
 root = tk.Tk()
 root.tk_strictMotif(boolean=True)
-root.maxsize(width=509, height=340)
-root.minsize(width=509, height=340)
+
+if len(sys.argv) >= 2 and sys.argv[1] == "-s":
+	root.maxsize(width=509, height=340)
+	root.minsize(width=509, height=340)
+else:
+	root.attributes("-fullscreen", True) # run fullscreen
+	root.wm_attributes("-topmost", True) # keep on top
+
+
 
 talerimg = tk.PhotoImage(file = "taler.png")
 
