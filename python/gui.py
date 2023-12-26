@@ -5,6 +5,8 @@ topratio = 0.2
 botratio = 0.15
 
 font = ("Sans", 24)
+fontsmall = ("Sans", 20)
+
 root = tk.Tk()
 root.tk_strictMotif(boolean=True)
 root.maxsize(width=480, height=320)
@@ -36,14 +38,16 @@ def matching_names(names, text):
 def name_callback(name):
 	if len(name) > 0:
 		message.config(text = name)
+		nameslots_buttons.lift()
 	else:
 		message.config(text = "Wie heißt du?")
+		nameslots_explainer.lift()
 
 	names = ["emilia", "noah", "mia", "matteo", "elias", "sophia", "sophie", "hanna", "leon", "kevin", "lukas", "laura", "anna", "julia", "katharina", "philipp", "alexander", "tobias", "daniel", "franziska"]
 	
 	matching = matching_names(names, name)
 
-	for i in range(6):
+	for i in range(4):
 		if i < len(matching):
 			nameslots[i].config(text=matching[i], command = lambda name=matching[i]: name_clicked(name))
 		else:
@@ -62,13 +66,13 @@ class Keyboard(tk.Frame):
 		self.string = ""
 		self.callback = callback
 		tk.Frame.__init__(self, master)
-		for i, letter in enumerate("qwertzuiopü"):
-			tk.Button(master=self, text=letter, font=font, command = lambda l=letter: self.type(l)).place(relx=(i/11.5), rely = 0, relwidth=1/11.5, relheight = 1/3)
-		for i, letter in enumerate("asdfghjklöä"):
-			tk.Button(master=self, text=letter, font=font, command = lambda l=letter: self.type(l)).place(relx=((i+.3)/11.5), rely = 1/3, relwidth=1/11.5, relheight = 1/3)
-		for i, letter in enumerate("zxcvbnm"):
-			tk.Button(master=self, text=letter, font=font, command = lambda l=letter: self.type(l)).place(relx=((i+.7)/11.5), rely = 2/3, relwidth=1/11.5, relheight = 1/3)
-		tk.Button(master=self, text="<--", font=font, command = lambda: self.backspace()).place(relx=((7.5+.7)/11.5), rely = 2/3, relwidth=2/11.5, relheight = 1/3)
+		for i, letter in enumerate("qwertzuiop"):
+			tk.Button(background="#555", foreground="white",master=self, text=letter, font=font, command = lambda l=letter: self.type(l)).place(relx=(i/10), rely = 0, relwidth=1/10, relheight = 1/3)
+		for i, letter in enumerate("asdfghjkl"):
+			tk.Button(background="#555", foreground="white",master=self, text=letter, font=font, command = lambda l=letter: self.type(l)).place(relx=((i+.3)/10), rely = 1/3, relwidth=1/10, relheight = 1/3)
+		for i, letter in enumerate("yxcvbnm"):
+			tk.Button(background="#555", foreground="white",master=self, text=letter, font=font, command = lambda l=letter: self.type(l)).place(relx=((i+.7)/10), rely = 2/3, relwidth=1/10, relheight = 1/3)
+		tk.Button(background="#555", foreground="white",master=self, text="<--", font=font, command = lambda: self.backspace()).place(relx=((7.5+.7)/10), rely = 2/3, relwidth=2/10, relheight = 1/3)
 
 	def type(self, letter):
 		self.string += letter
@@ -114,12 +118,18 @@ main_strichliste = tk.Frame(master=main)
 main_strichliste.place(relx=0, rely=0, relwidth=1, relheight=1)
 
 kbd = Keyboard(master=main_strichliste, callback = name_callback)
-kbd.place(relx=0, rely=0.5, relwidth=1, relheight=0.5)
+kbd.place(relx=0, rely=0.4, relwidth=1, relheight=0.6)
 
-nameslots = [tk.Button(master=main_strichliste, font=font) for i in range(6)]
-for i in range(3):
-	nameslots[i].place(relx=0, rely=i/3*0.5, relwidth=0.5, relheight=0.5/3)
-	nameslots[i+3].place(relx=0.5, rely=i/3*0.5, relwidth=0.5, relheight=0.5/3)
+nameslots_buttons = tk.Frame(master = main_strichliste)
+nameslots_buttons.place(relx=0, rely=0, relwidth = 1, relheight = 0.4)
+
+nameslots_explainer = tk.Label(master = main_strichliste, text="Fang an, deinen Namen\neinzugeben und tippe dann\nauf einen der Vorschläge.", font=fontsmall)
+nameslots_explainer.place(relx=0, rely=0, relwidth=1, relheight=0.4)
+
+nameslots = [tk.Button(master=nameslots_buttons, font=font) for i in range(4)]
+for i in range(2):
+	nameslots[i].place(relx=0, rely=i/2, relwidth=0.5, relheight=1/2)
+	nameslots[i+2].place(relx=0.5, rely=i/2, relwidth=0.5, relheight=1/2)
 
 main_welcome.lift()
 
