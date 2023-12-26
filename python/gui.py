@@ -50,7 +50,6 @@ def name_callback(name):
 	names = ["emilia", "noah", "mia", "matteo", "elias", "renè", "sophia", "günther", "sophie", "hanna", "leon", "kevin", "lukas", "laura", "anna", "julia", "katharina", "philipp", "alexander", "tobias", "daniel", "franziska"]
 	
 	matching = matching_names(names, name)
-	print("MATCH ", len(matching))
 
 	if len(name) == 0:
 		message.configure(text = "Wie heißt du?")
