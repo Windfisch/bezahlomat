@@ -1,6 +1,7 @@
 #import tkinter as tk
 import ctk_wrap as tk
 import re
+import unicodedata
 
 topratio = 0.2
 botratio = 0.15
@@ -23,21 +24,30 @@ def strichliste_clicked():
 	main_strichliste.lift()
 	name_callback("")
 
-def strip_name(n):
-	return re.sub("[^a-zA-ZäöüÄÖÜ]", "", n).lower()
+def strip_name1(n):
+	return re.sub("[^a-zA-Z]", "", n).lower()
+
+def strip_name2(n):
+	return strip_name1(unicodedata.normalize('NFD', n).encode('ASCII', 'ignore').decode())
+
+def strip_name3(n):
+	return strip_name2( n.lower().replace("ö", "oe").replace("ü", "ue").replace("ä", "ae"))
+
+def name_distance(typed, reference):
+	dists = [strip_fn(reference).find(typed) for strip_fn in  [strip_name1, strip_name2, strip_name3]]
+	dists = [d for d in dists if d >= 0] + [999]
+	return min(dists)
+
 
 def matching_names(names, text):
 	text = text.lower()
-	matches = [(strip_name(name).find(text), name) for name in names]
-	print(matches)
-	print(strip_name("windfisch"))
-	print("windfisch".find(text))
-	matches = [(i, n)  for (i,n) in matches if i >= 0]
+	matches = [(name_distance(text, name), name) for name in names]
+	matches = [(i, n)  for (i,n) in matches if i < 999]
 	matches.sort()
 	return [n for i,n in matches]
 
 def name_callback(name):
-	names = ["emilia", "noah", "mia", "matteo", "elias", "sophia", "sophie", "hanna", "leon", "kevin", "lukas", "laura", "anna", "julia", "katharina", "philipp", "alexander", "tobias", "daniel", "franziska"]
+	names = ["emilia", "noah", "mia", "matteo", "elias", "renè", "sophia", "günther", "sophie", "hanna", "leon", "kevin", "lukas", "laura", "anna", "julia", "katharina", "philipp", "alexander", "tobias", "daniel", "franziska"]
 	
 	matching = matching_names(names, name)
 	print("MATCH ", len(matching))
@@ -128,7 +138,7 @@ kbd.place(relx=0, rely=0.4, relwidth=1, relheight=0.6)
 nameslots_buttons = tk.Frame(master = main_strichliste)
 nameslots_buttons.place(relx=0, rely=0, relwidth = 1, relheight = 0.4)
 
-nameslots_explainer = tk.Label(master = main_strichliste, text="Fang an, deinen Namen\neinzugeben und tippe dann\nauf einen der Vorschläge.", font=fontsmall)
+nameslots_explainer = tk.Label(master = main_strichliste, text="Tippe deinen Namen ein und\ntippe dann auf einen der Vorschläge.\n(Sonderzeichen/Umlaute kannst du weglassen.)", font=fontsmall)
 nameslots_explainer.place(relx=0, rely=0, relwidth=1, relheight=0.4)
 
 nameslots_nomatches = tk.Label(master = main_strichliste, text="Nichts gefunden.\nHast du dich vielleicht vertippt?", font=fontsmall)
