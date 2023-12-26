@@ -1,4 +1,5 @@
-import tkinter as tk
+#import tkinter as tk
+import ctk_wrap as tk
 import re
 
 topratio = 0.2
@@ -9,14 +10,14 @@ fontsmall = ("Sans", 20)
 
 root = tk.Tk()
 root.tk_strictMotif(boolean=True)
-root.maxsize(width=480, height=320)
-root.minsize(width=480, height=320)
+root.maxsize(width=509, height=340)
+root.minsize(width=509, height=340)
 
 talerimg = tk.PhotoImage(file = "taler.png")
 
 
 def taler_clicked():
-	message.config(text = "Fnord")
+	message.configure(text = "Fnord")
 
 def strichliste_clicked():
 	main_strichliste.lift()
@@ -36,26 +37,30 @@ def matching_names(names, text):
 	return [n for i,n in matches]
 
 def name_callback(name):
-	if len(name) > 0:
-		message.config(text = name)
-		nameslots_buttons.lift()
-	else:
-		message.config(text = "Wie heißt du?")
-		nameslots_explainer.lift()
-
 	names = ["emilia", "noah", "mia", "matteo", "elias", "sophia", "sophie", "hanna", "leon", "kevin", "lukas", "laura", "anna", "julia", "katharina", "philipp", "alexander", "tobias", "daniel", "franziska"]
 	
 	matching = matching_names(names, name)
+	print("MATCH ", len(matching))
+
+	if len(name) == 0:
+		message.configure(text = "Wie heißt du?")
+		nameslots_explainer.lift()
+	elif len(matching) == 0:
+		message.configure(text = name)
+		nameslots_nomatches.lift()
+	else:
+		message.configure(text = name)
+		nameslots_buttons.lift()
 
 	for i in range(4):
 		if i < len(matching):
-			nameslots[i].config(text=matching[i], command = lambda name=matching[i]: name_clicked(name))
+			nameslots[i].configure(text=matching[i], state="enabled", background="blue", command = lambda name=matching[i]: name_clicked(name))
 		else:
-			nameslots[i].config(text="", command = lambda:None)
+			nameslots[i].configure(text="", state="disabled", background = "gray", command = lambda:None)
 
 def name_clicked(name):
 	print("going to charge %s's wallet" % name)
-	message.config(text="Bitte Geld eingeben")
+	message.configure(text="Bitte Geld eingeben")
 
 
 def back_clicked():
@@ -125,6 +130,9 @@ nameslots_buttons.place(relx=0, rely=0, relwidth = 1, relheight = 0.4)
 
 nameslots_explainer = tk.Label(master = main_strichliste, text="Fang an, deinen Namen\neinzugeben und tippe dann\nauf einen der Vorschläge.", font=fontsmall)
 nameslots_explainer.place(relx=0, rely=0, relwidth=1, relheight=0.4)
+
+nameslots_nomatches = tk.Label(master = main_strichliste, text="Nichts gefunden.\nHast du dich vielleicht vertippt?", font=fontsmall)
+nameslots_nomatches.place(relx=0, rely=0, relwidth=1, relheight=0.4)
 
 nameslots = [tk.Button(master=nameslots_buttons, font=font) for i in range(4)]
 for i in range(2):
