@@ -3,9 +3,63 @@ import ctk_wrap as tk
 import re
 import unicodedata
 import sys
+import taler
+import fake_money
+import qrcode
+import time
+
+money = taler.MoneyPool()
+
+
+
+def money_callback(amount):
+	global mode
+	print("received money %s" % amount)
+	money.update(amount)
+
+def taler_money_callback(total):
+	global mode
+	global img
+	if mode == "taler":
+		print("total moneyy is %s" % total)
+		uri = taler_mgr.set_amount(total)
+		print(uri)
+
+		img = qrcode.make(uri).get_image()
+		print("made qrcode")
+
+		print(img.size)
+		try:
+			taler_qrcode.configure(image = tk.CTkImage(img, size = (200,200)), text="")
+		except Exception as e:
+			print("FAIL", e)
+		print("YEAY")
+
+def taler_money_done_callback(withdrawn):
+	global taler_mgr
+
+	print("taler done (withdrawn = %s). grace time starts" % withdrawn)
+	money.update(-withdrawn)
+	time.sleep(5)
+	print("taler done ends, money is %s" % money.get())
+	if money.get() <= 0:
+		back_clicked()
+	else:
+		taler_clicked()
+		taler_money_callback(money.get())
+
+
+taler_mgr = None
+
+money.callbacks.append(taler_money_callback)
+
+
+fake_money.watch(money_callback)
 
 topratio = 0.2
 botratio = 0.15
+
+mode = "menu"
 
 font = ("Sans", 24)
 fontsmall = ("Sans", 20)
@@ -26,11 +80,19 @@ talerimg = tk.PhotoImage(file = "taler.png")
 
 
 def taler_clicked():
-	message.configure(text = "Fnord")
+	global mode
+	global taler_mgr
+
+	message.configure(text = "Gib moneyz pls")
+	main_taler.lift()
+	mode = "taler"
+	taler_mgr = taler.TalerManager(taler.cfg, taler_money_done_callback)
 
 def strichliste_clicked():
+	global mode
 	main_strichliste.lift()
 	name_callback("")
+	mode = "strichliste"
 
 def strip_name1(n):
 	return re.sub("[^a-zA-Z]", "", n).lower()
@@ -81,7 +143,10 @@ def name_clicked(name):
 
 
 def back_clicked():
-	pass
+	global mode
+	if mode == "taler":
+		mode = "menu"
+		main_welcome.lift()
 
 class Keyboard(tk.Frame):
 	def __init__(self, master, callback):
@@ -135,6 +200,15 @@ langbtn.place(relx=0.7, relwidth=0.3, rely=0, relheight=1)
 
 credit = tk.Label(master=bottom, text = "13.37€", font=font)
 credit.place(relx=0.3, relwidth=0.4, rely=0, relheight=1)
+
+main_taler = tk.Frame(master=main)
+main_taler.place(relx=0, rely=0, relwidth=1, relheight=1)
+
+taler_qrcode = tk.Label(master=main_taler)
+taler_qrcode.place(relx=0, rely = 0, relwidth=0.6, relheight=1)
+
+taler_explainer = tk.Label(master=main_taler, text="Feed moar\nmoneyz pls")
+taler_explainer.place(relx=.65, rely=0, relwidth=0.35, relheight=1)
 
 main_strichliste = tk.Frame(master=main)
 main_strichliste.place(relx=0, rely=0, relwidth=1, relheight=1)
