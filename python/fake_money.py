@@ -14,7 +14,7 @@ def watch(callback):
 def _watch_thread(callback):
 	f = open("/tmp/money", "r")
 	while True:
-		time.sleep(1)
+		time.sleep(0.1)
 		line = f.readline()
 		if line == "": continue
 		print("read '%s'" % line)

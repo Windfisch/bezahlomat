@@ -11,8 +11,9 @@ class Tk(CTk):
 	pass
 
 class PhotoImage(CTkImage):
-	def __init__(self, file):
-		CTkImage.__init__(self, Image.open(file))
+	def __init__(self, file, size=None):
+		img = Image.open(file)
+		CTkImage.__init__(self, img, size=img.size)
 
 class Frame(CTkFrame):
 	pass

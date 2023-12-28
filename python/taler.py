@@ -141,15 +141,15 @@ class TalerManager:
 		print("wait and confirm returned %s" % amount)
 		if amount > 0:
 			self.confirmed += amount
-		print("thread exiting")
-		self.callback(self.confirmed)
+			print("thread exiting")
+			self.callback(self.confirmed)
 	
 	def cancel(self):
 		if self.op is None and self.thread is None:
 			return
 
 		if self.op.cancel() == True:
-			self.op = None
+			pass
 		else:
 			raise RuntimeError("Failed to cancel old transaction")
 

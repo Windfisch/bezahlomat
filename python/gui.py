@@ -39,6 +39,8 @@ def taler_money_done_callback(withdrawn):
 	global taler_mgr
 
 	print("taler done (withdrawn = %s). grace time starts" % withdrawn)
+	taler_mgr = None
+	taler_explainer.configure(text="Vielen Dank.")
 	money.update(-withdrawn)
 	time.sleep(5)
 	print("taler done ends, money is %s" % money.get())
@@ -47,6 +49,7 @@ def taler_money_done_callback(withdrawn):
 	else:
 		taler_clicked()
 		taler_money_callback(money.get())
+		taler_explainer.configure(text="Bitte nochmal\nscannen!")
 
 
 taler_mgr = None
@@ -76,14 +79,17 @@ else:
 
 
 
-talerimg = tk.PhotoImage(file = "taler.png")
+talerimg = tk.PhotoImage(file = "taler.png", size = (192,82))
 
 
 def taler_clicked():
 	global mode
 	global taler_mgr
 
-	message.configure(text = "Gib moneyz pls")
+	message.configure(text = "GNU-Taler-Wallet aufladen")
+
+	taler_explainer = tk.Label(master=main_taler, text="Bitte zahle den\ngewünschten\nBetrag ein\n und scanne\ndann den QR-\ncode links.", font=fontsmall)
+
 	main_taler.lift()
 	mode = "taler"
 	taler_mgr = taler.TalerManager(taler.cfg, taler_money_done_callback)
@@ -204,10 +210,10 @@ credit.place(relx=0.3, relwidth=0.4, rely=0, relheight=1)
 main_taler = tk.Frame(master=main)
 main_taler.place(relx=0, rely=0, relwidth=1, relheight=1)
 
-taler_qrcode = tk.Label(master=main_taler)
+taler_qrcode = tk.Label(master=main_taler, text="(Auflade-QR-Code wird\nhier angezeigt werden.)")
 taler_qrcode.place(relx=0, rely = 0, relwidth=0.6, relheight=1)
 
-taler_explainer = tk.Label(master=main_taler, text="Feed moar\nmoneyz pls")
+taler_explainer = tk.Label(master=main_taler, text="Bitte zahle den\ngewünschten\nBetrag ein\n und scanne\ndann den QR-\ncode links.", font=fontsmall)
 taler_explainer.place(relx=.65, rely=0, relwidth=0.35, relheight=1)
 
 main_strichliste = tk.Frame(master=main)
