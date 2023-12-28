@@ -4,7 +4,7 @@ import re
 import unicodedata
 import sys
 import taler
-import fake_money
+import real_money as money_acceptor
 import qrcode
 import time
 
@@ -42,7 +42,8 @@ def taler_money_done_callback(withdrawn):
 	taler_mgr = None
 	taler_explainer.configure(text="Vielen Dank.")
 	money.update(-withdrawn)
-	time.sleep(5)
+	money_acceptor.disable()
+	time.sleep(1)
 	print("taler done ends, money is %s" % money.get())
 	if money.get() <= 0:
 		back_clicked()
@@ -51,13 +52,16 @@ def taler_money_done_callback(withdrawn):
 		taler_money_callback(money.get())
 		taler_explainer.configure(text="Bitte nochmal\nscannen!")
 
+def update_credit_label(total):
+    credit.configure(text = "%.2f€" % total)
 
 taler_mgr = None
 
+money.callbacks.append(update_credit_label)
 money.callbacks.append(taler_money_callback)
 
 
-fake_money.watch(money_callback)
+money_acceptor.watch(money_callback)
 
 topratio = 0.2
 botratio = 0.15
@@ -93,6 +97,7 @@ def taler_clicked():
 	main_taler.lift()
 	mode = "taler"
 	taler_mgr = taler.TalerManager(taler.cfg, taler_money_done_callback)
+	money_acceptor.enable()
 
 def strichliste_clicked():
 	global mode
@@ -204,7 +209,7 @@ backbtn.place(relx=0, rely=0, relwidth=.3, relheight=1)
 langbtn = tk.Button(master=bottom, text = "Sprache")
 langbtn.place(relx=0.7, relwidth=0.3, rely=0, relheight=1)
 
-credit = tk.Label(master=bottom, text = "13.37€", font=font)
+credit = tk.Label(master=bottom, text = "0€", font=font)
 credit.place(relx=0.3, relwidth=0.4, rely=0, relheight=1)
 
 main_taler = tk.Frame(master=main)
